@@ -1,0 +1,277 @@
+﻿<div class="wln">
+    <div class="wln-title">
+        <span>
+            <input type="text" id="searchkey" onkeydown="ToSearch(event)" placeholder="按回车键进行查找" />
+        </span>
+        <strong>VR设备</strong>
+    </div>
+    <div class="line"></div>
+    <table id="dataTable">
+        <tr>
+            <td style="width:198px; text-align:center;" function="Client">设备</td>
+            <td style="width:128px; text-align:center;" filed="LastBilling">计费时间</td>
+            <td style="width:58px; text-align:center;" filed="Status">状态</td>
+            <td style="width:98px; text-align:center;" function="Member">会员</td>
+            <td style="width:98px; text-align:center;" function="Unlock">上下机</td>
+            <td style="width:168px;" function="onAction">操作</td>
+        </tr>
+    </table>
+    <div class="control-window" id="adjust">
+        <table class="control-window-table">
+            <tr>
+                <td>收费金额：</td>
+                <td>
+                    <input type="text" id="AdjustAmount" /><span class="tips notnull">元</span>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="Adjust();">确定</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+    <div class="control-window" id="unlock">
+        <table class="control-window-table">
+            <tr>
+                <td>上机时长：</td>
+                <td>
+                    <input type="text" id="AddTime" onkeyup="TimeChange()" /><span class="tips notnull">分钟</span>
+                </td>
+            </tr>
+            <tr>
+                <td>收费标准：</td>
+                <td style="color:darkgreen;">
+                    <font type="text" id="HourPrice" style="font-size:2rem;"></font>&nbsp;<font>元/小时</font>
+                </td>
+            </tr>
+            <tr>
+                <td>收费金额：</td>
+                <td>
+                    <font type="text" id="Amount" style="font-size:2rem;color:crimson;"></font>&nbsp;<font>元</font>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="Unlock();">确定</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+    <div class="control-window" id="online">
+        <table class="control-window-table">
+            <tr>
+                <td>收费标准：</td>
+                <td style="color:darkgreen;">
+                    <font type="text" id="OnlinePrice" style="font-size:2rem;"></font>&nbsp;<font>元/小时</font>
+                </td>
+            </tr>
+            <tr>
+                <td>开始时间：</td>
+                <td>
+                    <font type="text" id="OnlineBegin" style="font-size:2rem;"></font>&nbsp;(已在线<font id="OnlineUse">0</font>分钟，暂停<font id="OnlinePause">0</font>分钟)
+                </td>
+            </tr>
+            <tr>
+                <td>剩余时长：</td>
+                <td>
+                    <font type="text" id="OnlineEnd" style="font-size:2rem;"></font>&nbsp;<font>分钟</font>
+                </td>
+            </tr>
+            <tr>
+                <td>消费金额：</td>
+                <td>
+                    <font type="text" id="OnlineAmount" style="font-size:2rem;color:crimson;"></font>&nbsp;<font>元</font>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="ShowAddTime();">加时</a>
+            <a class="button green" onclick="ShowAdjust();">结算下机</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+    <div class="control-window" id="setName">
+        <table class="control-window-table">
+            <tr>
+                <td>设备名称：</td>
+                <td>
+                    <input type="text" id="ClientName" /><span class="tips">用于区别不同设备</span>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="Set();">确定</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+    tr .curr,tr .curr_prev{width:24px;height:16px;display:inline-block;cursor:pointer;vertical-align:middle;}
+    tr:hover .curr{background:url(/edit.png) center center no-repeat;background-size:16px;}
+</style>
+<script type="text/javascript">
+    var table = control.datagrid('dataTable', location.pathname + '?do=pager', 100);
+    function ToSearch(e) {
+        if (e.keyCode == 13) {
+            table.pageIndex = 1;
+            table.load({ key: $('#searchkey').val() })
+        }
+    }
+    table.Client = function (e) {
+        var currEdit = '<a class="curr" onclick="SetClient(\'' + e.ClientCode + '\',\'' + e.ClientName + '\')"></a>';
+        if (e.ClientName) {
+            return '<em class="curr_prev"></em><font title="' + e.ClientCode + '">' + e.ClientName + '</font>' + currEdit;
+        } else {
+            return '<em class="curr_prev"></em>' + e.ClientCode + currEdit;
+        }
+    }
+    table.Member = function (e) {
+        if (e.MemberId > 0) {
+            return '<a style="color:#7DB72F" href="member?mid=' + e.MemberId + '">' + e.MemberName + '</a>';
+        } else {
+            return '散客';
+        }
+    }
+    table.Status = function (e) {
+        if (e.Status == '离线') {
+            return '<font style="color:#999999">' + e.Status + '</font>';
+        } else if (e.Status == '空闲') {
+            return '<font style="color:#7DB72F">' + e.Status + '</font>';
+        }
+        return '<font style="color:orangered">' + e.Status + '</font>';
+    }
+    table.Unlock = function (e) {
+        if (e.Status == '空闲') {
+            return '<a onclick="ShowUnlock(\'' + e.ClientCode + '\',\'' + e.Price + '\')">散客上机</a>';
+        } else if (e.Status == '在线') {
+            return '<a onclick="ShowOnline(\'' + e.ClientCode + '\')" style="color:orangered">查看详情</a>';
+        }
+        return '';
+    }
+    table.onAction = function (e) {
+        return '<a href="clientprice?code=' + e.ClientCode + '">收费标准</a>&nbsp;&nbsp;<a onclick="Del(\'' + e.ClientCode + '\')" style="color:#999999;">删除</a>';
+    }
+    function Del(ClientCode) {
+        control.confirm('确定要删除此设备吗?', '操作确认', function () {
+            $.getJSON(location.pathname + '?do=del', { ClientCode: ClientCode }, function (json) {
+                if (json.success) {
+                    table.reload();
+                } else {
+                    control.error(json.message);
+                }
+            });
+        });
+    }
+    var thisCode = '';
+    var thisPrice = 0;
+    var thisRecordId = 0;
+    var thisAmount = '';
+    function SetClient(ClientCode, ClientName) {
+        thisCode = ClientCode;
+        control.window('setName', '设备名称', 520, 180, function () {
+            $('#ClientName').val(ClientName);
+        });
+    }
+    function Set() {
+        $.getJSON(location.pathname + '?do=set', {
+            ClientCode: thisCode
+            , ClientName: encodeURIComponent($('#ClientName').val())
+        }, function (json) {
+            if (json.success) {
+                control.close();
+                table.reload();
+            } else {
+                control.alert(json.message);
+            }
+        });
+    }
+
+    function Adjust(ClientCode) {
+        if (thisAmount && !$('#AdjustAmount').val()) {
+            control.error('请先填写收费金额');
+        } else {
+            $.getJSON(location.pathname + '?do=adjust', { ClientCode: thisCode, Amount: $('#AdjustAmount').val() }, function (json) {
+                if (json.success) {
+                    control.close();
+                    table.reload();
+                } else {
+                    control.error(json.message);
+                }
+            });
+        }
+    }
+    function Unlock() {
+        $.getJSON(location.pathname + '?do=unlock', { ClientCode: thisCode, addtime: $('#AddTime').val(), amount: $('#Amount').val() }, function (json) {
+            if (json.success) {
+                table.reload();
+                control.close();
+                control.success(json.message, function () {
+                    table.reload()
+                });
+            } else {
+                control.alert(json.message);
+            }
+        });
+    }
+    function ShowOnline(ClientCode) {
+        thisCode = ClientCode;
+        $.getJSON(location.pathname + '?do=online', { ClientCode: thisCode }, function (rlt) {
+            if (rlt.success) {
+                var json = rlt.data;
+                thisRecordId = json.RecordId;
+                thisPrice = parseFloat(json.Price);
+                if (json.MemberId > 0) {
+                    thisAmount = '';
+                } else {
+                    thisAmount = json.Amount;
+                }
+                control.window('online', '在线详情', 520, 380, function () {
+                    $('#OnlinePrice').text(json.Price);
+                    $('#OnlineBegin').text(json.BeginTime);
+                    $('#OnlineUse').text(json.UseTime);
+                    $('#OnlinePause').text(json.Pause);
+                    $('#OnlineEnd').text(json.EndTime);
+                    $('#OnlineAmount').text(json.Amount);
+                }, function () {
+                    table.reload();
+                });
+            } else {
+                control.error(json.message);
+            }
+        });
+    }
+    function ShowUnlock(ClientCode, Price, winTitle) {
+        thisCode = ClientCode;
+        thisPrice = parseFloat(Price);
+        $('#HourPrice').text(Price);
+        $('#Amount').text('0.00');
+        control.window('unlock', winTitle ? winTitle : '散客上机', 520, 380, function () {
+            $('#AddTime').focus();
+        });
+    }
+    function ShowAdjust() {
+        if (thisAmount) {
+            control.close();
+            wln.sleep(500);
+            control.window('adjust', '结算下机', 520, 180, function () {
+                $('#AdjustAmount').val(thisAmount);
+            });
+        } else {
+            control.confirm('确定要立即从此设备下机吗?', '操作确认', function () {
+                Adjust();
+            });
+        }
+    }
+    function ShowAddTime() {
+        control.close();
+        wln.sleep(500);
+        ShowUnlock(thisCode, thisPrice, '增加时长');
+    } 
+    function TimeChange() {
+        var amount = (thisPrice * parseInt($('#AddTime').val())) / 60.0;
+        if (amount > 0) {
+            $('#Amount').text(wln.util.toDecimal(amount));
+        } else {
+            $('#Amount').text('0.00');
+        }
+    }
+</script>

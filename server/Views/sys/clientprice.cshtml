@@ -1,0 +1,75 @@
+﻿<div class="wln">
+    <div class="wln-title">
+        <strong>价格列表</strong>
+    </div>
+    <div class="line"></div>
+    <table id="dataTable">
+        <tr>
+            <td style="width:28px; text-align:center;" filed="RowIndex">序号</td>
+            <td style="width:158px; text-align:center;" filed="GroupName">分组</td>
+            <td style="width:98px; text-align:center;" filed="Price">小时单价</td>
+            <td style="width:168px;" function="onAction">操作</td>
+        </tr>
+    </table>
+
+    <div class="control-window" id="groupclientinfo">
+        <table class="control-window-table">
+            <tr>
+                <td>单价：</td>
+                <td>
+                    <input type="text" id="Price" /><span class="tips notnull">元/小时</span>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="Save();">确定</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var table = control.datagrid('dataTable', location.pathname + '?do=pager', 100, {code:"@ViewBag.ClientCode"});
+    table.State = function (e) {
+        if (e.State == '正常') {
+            return '<font style="color:#7DB72F">' + e.State + '</font>';
+        } else {
+            return '<font style="color:#999999">' + e.State + '</font>';
+        }
+    }
+    table.onAction = function (e) {
+        if (e.Id > 0) {
+            return '<a onclick="Form(\'' + e.GroupId + '\',\'' + e.Price + '\')">修改</a>&nbsp;<a onclick="Del(\'' + e.Id + '\')">删除</a>';
+        } else {
+            return '<a onclick="Form(\'' + e.GroupId + '\',\'' + e.Price + '\')">设置</a>';
+        }
+    }
+    var thisId = '';
+    function Form(GroupId, Price) {
+        thisId = GroupId;
+        control.window('groupclientinfo', '收费标准', 520, 180, function () {
+            $('#Price').val(Price);
+        });
+    }
+    function Save() {
+        $.getJSON(location.pathname + '?do=set', { code: '@ViewBag.ClientCode', GroupId: thisId, Price: $('#Price').val() }, function (json) {
+            if (json.success) {
+                table.reload();
+                control.close();
+            } else {
+                control.error(json.message);
+            }
+        });
+    }
+    function Del(Id) {
+        control.confirm('确定要删除此信息吗?', '操作确认', function () {
+            $.getJSON(location.pathname + '?do=del', { Id: Id }, function (json) {
+                if (json.success) {
+                    table.reload();
+                } else {
+                    control.error(json.message);
+                }
+            });
+        });
+    }
+</script>

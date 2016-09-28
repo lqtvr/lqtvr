@@ -1,0 +1,45 @@
+﻿<div id="pageBody" style="display:table;width:100%">
+    <div style="display:table-cell;vertical-align:top;position:absolute;" class="sidebar-left">
+        <ul class="sidebar">
+            <li>
+                <a link="client">
+                    <i class="iconfont icon-solidmember" style="font-size:3rem"></i>
+                    <span class="sidebar-text">VR设备</span>
+                </a>
+            </li>
+            <li>
+                <a link="members">
+                    <i class="iconfont icon-solidmember" style="font-size:3rem"></i>
+                    <span class="sidebar-text">会员管理</span>
+                </a>
+                <div class="wlnMenu">
+                    <h2>会员管理</h2>
+                    <a link="members">会员列表</a>
+                    <a link="member">会员查询</a>
+                </div>
+            </li>
+            <li>
+                <a link="memberxftj">
+                    <i class="iconfont icon-solidmember" style="font-size:3rem"></i>
+                    <span class="sidebar-text">营业统计</span>
+                </a>
+            </li><li>
+                <a link="setting">
+                    <i class="iconfont icon-solidconfig" style="font-size:3rem"></i>
+                    <span class="sidebar-text">设置</span>
+                </a>
+                <div class="wlnMenu">
+                    <h2>系统设置</h2>
+                    <a link="setting">基础设置</a>
+                    <a link="membergroup">会员分组</a>
+                    <a link="resetpwd">修改密码</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div style="display:table-cell;vertical-align:top;" id="ifrContent"></div>
+</div>
+<script type="text/javascript">
+    initMenu();
+    document.getElementsByTagName('a')[0].click();
+</script>

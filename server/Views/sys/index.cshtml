@@ -1,0 +1,33 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <title>@Html.Raw(ViewBag.SystemTitle)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript" src="@ViewBag.Assets/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="@ViewBag.Assets/wlniao/1.0.0/wln.js"></script>
+    <script type="text/javascript" src="@ViewBag.Assets/wlnctrl/0.3.0/control.js"></script>
+</head>
+<body style="width:100%;height:100%;overflow:hidden;background:#ffffff">
+    <header id="header" class="header">
+        <span>
+            <svg width="200" height="200" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g class="transform-group"><g transform="scale(0.1953125, 0.1953125)"><path d="M689.599907 602.693582c-46.974871 0-85.019349-38.423101-85.019349-85.87074 0-47.443545 38.043455-85.866646 85.019349-85.866646 46.974871 0 85.019349 38.423101 85.019349 85.866646C774.619256 564.271504 736.574778 602.693582 689.599907 602.693582zM341.573469 602.733491c-47.001477 0-85.058235-38.440497-85.058235-85.910649s38.056758-85.906555 85.058235-85.906555c46.99636 0 84.975347 38.436404 84.975347 85.906555S388.486942 602.733491 341.573469 602.733491zM850.90264 272.728498 178.226171 272.728498c-25.089421 0-46.239114 21.375843-46.239114 47.739281l0 392.716266c0 26.362414 21.148669 47.734164 47.240931 47.734164l183.751001 0c19.701714 0 36.588313-12.17939 43.683918-29.498848l53.429887-130.402979c9.010211-21.988804 30.450523-37.458123 55.471382-37.458123 25.019837 0 46.460148 15.46932 55.470359 37.458123l53.429887 130.402979c7.096628 17.319457 23.982204 29.498848 42.682102 29.498848l183.755094 0c27.089985 0 48.239677-21.37175 48.239677-47.734164L899.141294 320.467779C899.142318 294.104341 877.992625 272.728498 850.90264 272.728498z" fill="#f4c600"></path></g></g></svg>
+        </span>
+        <h2>@Html.Raw(ViewBag.ShopName)</h2>
+        <div class="navbar radius">
+            <a class="button white small" href="javascript:GotoPage('/public')">@Html.Raw(ViewBag.NickName)</a>
+            <a class="button orange small" href="/?do=logout">退出登录</a>
+        </div>
+    </header>
+    <div id="ifrContent" style="display:table;width:100%;background-color:#ffffff;"></div>
+    <script type="text/javascript">
+        control(function () {
+            control.iHeight = $(window).height() - $('#header').height();
+            $("#" + control.eleContent).height(control.iHeight);
+            control.GotoPage('main');
+        })
+    </script>
+</body>
+</html>

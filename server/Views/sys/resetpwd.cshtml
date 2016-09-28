@@ -1,0 +1,57 @@
+﻿<div class="wln">
+    <div class="wln-title">
+        <strong>修改登录密码</strong>
+    </div>
+    <div class="line"></div>
+    <table class="control-window-table">
+        <tr>
+            <td>原密码：</td>
+            <td>
+                <input type="password" id="OldPwd" /><span class="tips notnull">登录密码</span>
+            </td>
+        </tr>
+        <tr>
+            <td>新密码：</td>
+            <td>
+                <input type="password" id="NewPwd" /><span class="tips notnull">新的登录密码</span>
+            </td>
+        </tr>
+        <tr>
+            <td>重新输入新密码：</td>
+            <td>
+                <input type="password" id="ReNewPwd" /><span class="tips notnull">验证新的登录密码</span>
+            </td>
+        </tr>
+        <tr>
+            <td >
+            </td>
+            <td style="text-align:left;">
+                <a class="button green" onclick="Save();">保存</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+    function Save() {
+        if ($('#NewPwd').val() != $('#ReNewPwd').val())
+        {
+            control.alert("两次新密码不一致，请重新输入！");
+            $('#ReNewPwd').foucs();
+        }
+        $.getJSON(location.pathname + '?do=repwd', {
+            OldPwd: $('#OldPwd').val()
+            , NewPwd: $('#NewPwd').val()
+        }, function (json) {
+            if (json.success) {
+                control.success("密码修改成功，请重新登录", function () {
+                    top.location.href = '/?do=logout';
+                });
+                $('#OldPwd').val('');
+                $('#NewPwd').val('');
+                $('#ReNewPwd').val('');
+            } else {
+                control.error(json.message);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,64 @@
+﻿
+<link rel="stylesheet" type="text/css" href="/js/calendar/calendar.css" />
+<script type="text/javascript" src="/js/calendar/calendar.js"></script>
+<div class="wln">
+    <div class="wln-title">
+        <span>
+            <select id="type" style="height:2.4rem;vertical-align:initial;">
+                <option value="0" selected="selected">全部记录</option>
+                <option value="1">会员充值</option>
+                <option value="2">会员消费</option>
+                <option value="3">散客消费</option>
+            </select>
+            <input type="text" id="Time" style="line-height:2.4rem;vertical-align:initial;width:210px;text-align:center;" />
+            <a class="button blue small" onclick="ToSearch();" style="height:34px;border-radius:4px;">查询</a>
+        </span>
+        <em style="width:20%;float:left;">充值总额：<font style="color:forestgreen" id="recharge">0.00</font> 元</em>
+        <em style="width:20%;float:left;">会员消费：<font style="color:orangered" id="consumption">0.00</font> 元</em>
+        <em style="width:20%;float:left;">散客消费：<font style="color:orangered" id="individual">0.00</font> 元</em>
+    </div>
+    <div class="line"></div>
+    <table id="dataTable">
+        <tr>
+            <td style="width:58px; text-align:center;" filed="MemberNumber">会员号</td>
+            <td style="width:128px; text-align:center;" filed="MemberName">会员名称</td>
+            <td style="width:58px; text-align:right;" filed="Price">金额</td>
+            <td style="width:128px; text-align:center;" filed="Type">类型</td>
+            @*<td style="width:58px; text-align:center;" filed="ClientId">所属客户端</td>*@
+            <td style="width:128px; text-align:center;" filed="CreateTime">消费时间</td>
+        </tr>
+    </table>
+
+</div>
+<script type="text/javascript">
+    $('#Time').calendar({
+        format: 'yyyy-MM-dd',
+        startDate: '2016-01-01',
+        endDate: new Date().Format('yyyy-MM-dd'),
+        mode: 'range'
+    });
+    var days = $.calendar.getDays();
+    $.getJSON(location.pathname + '?do=total', { begin: days[0], end: days[1] }, function (json) {
+        $('#recharge').html(json.recharge);
+        $('#individual').html(json.individual);
+        $('#consumption').html(json.consumption);
+    });
+    var table = control.datagrid('dataTable', location.pathname + '?do=pager', 10, { begin: days[0], end: days[1] });
+    table.Type = function (e) {
+        if (e.Type == '充值') {
+            return '<font style="color:#7DB72F">' + e.Type + '</font>';
+        } else {
+            return '<font style="color:#999999">' + e.Type + '</font>';
+        }
+    }
+    function ToSearch() {
+        days = $.calendar.getDays();
+        table.pageIndex = 1;
+        table.load({ type: $('#type').val(), begin: days[0], end: days[1] });
+        $.getJSON(location.pathname + '?do=total', { begin: days[0], end: days[1] }, function (json) {
+            $('#recharge').html(json.recharge);
+            $('#individual').html(json.individual);
+            $('#consumption').html(json.consumption);
+        });
+    }
+</script>

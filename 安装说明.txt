@@ -1,0 +1,6 @@
+server文件夹为服务端程序，xclient为客户端程序，server运行在收银的电脑上，xclient运行在游戏主机上，运行xclient前请先启动server。
+服务端请运行server文件夹下的DotServer.exe文件或DotServer_Win10.exe文件。
+客户端请将xclient文件夹拷贝到客户机，直接运行XClient.exe即可，如启动运行失败请先安装.NETFX4.5
+
+第一步：安装.NETFX 4.5
+第二步：安装DotNetCore.1.0.0-Runtime（仅服务端电脑需要安装。注意区分32位或64位）

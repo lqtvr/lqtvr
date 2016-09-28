@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <script src="http://static.earnflying.com/public/js/jquery.min.js"></script>
+    <link href="reset.css" rel="stylesheet">
+    <link href="calendar.css" rel="stylesheet">
+</head>
+
+<body style="min-height:500px">
+    <input type="text" autocomplete="false" id="search" style="margin:30px">
+    <script src="calendar.js"></script>
+    <script>
+        $('#search').calendar({
+            format: 'yyyy-MM-dd',
+            startDate: new Date().Format('yyyy-MM-dd'),
+            endDate: '2017-01-10',
+            mode: 'range', //single || range || multiple
+            // onSelectedDay: function(obj, elem) {
+            //     console.log(obj);
+            // }
+        });
+        //$.calendar.selectedDays() //选择日期
+    </script>
+</body>
+
+</html>

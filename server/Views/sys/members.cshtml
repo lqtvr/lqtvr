@@ -1,0 +1,171 @@
+﻿<div class="wln">
+    <div class="wln-title">
+        <span>
+            <input type="text" id="searchkey" onkeydown="ToSearch(event)" placeholder="按回车键进行查找" />
+        </span>
+        <strong>会员列表</strong><a onclick="Form('')"><i class="iconfont icon-plug"></i>新增</a>
+    </div>
+    <div class="line"></div>
+    <table id="dataTable">
+        <tr>
+            <td style="width:28px; text-align:center;" filed="RowIndex">序号</td>
+            <td style="width:58px; text-align:center;" filed="Name">姓名</td>
+            <td style="width:78px; text-align:center;" filed="MemberNumber">会员号</td>
+            <td style="width:68px; text-align:right;" filed="Balance">余额</td>
+            <td style="width:158px; text-align:center;" filed="LastVisit">最近来访</td>
+            <td style="width:58px; text-align:center;" filed="State">状态</td>
+            <td style="width:58px; text-align:center;" filed="MemberLevel">分组</td>
+            <td style="width:128px; text-align:center;" filed="CreateTime">添加时间</td>
+            <td style="width:168px;" function="onAction">操作</td>
+        </tr>
+    </table>
+
+    <div class="control-window" id="userinfo">
+        <table class="control-window-table">
+            <tr>
+                <td>会员号：</td>
+                <td>
+                    <input type="text" id="MemberNumber" /><span class="tips notnull">会员号，建议使用客户手机号码</span>
+                </td>
+            </tr>
+            <tr>
+                <td>姓名：</td>
+                <td>
+                    <input type="text" id="Name" /><span class="tips notnull">人员姓名，用于识别</span>
+                </td>
+            </tr>
+            <tr>
+                <td>性别：</td>
+                <td>
+                    <select id="Sex">
+                        <option value="0">未知</option>
+                        <option value="1">男</option>
+                        <option value="2">女</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>分组：</td>
+                <td>
+                    <select id="GroupId">
+                        @Html.Raw(ViewBag.MemberLevel)
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>状态：</td>
+                <td>
+                    <select id="State">
+                        <option value="1">正常</option>
+                        <option value="0" class="gray">停用</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="Save();">确定</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+
+    <div class="control-window" id="balance">
+        <table class="control-window-table">
+            <tr>
+                <td>充值金额：</td>
+                <td>
+                    <input type="text" id="Amount" /><span class="tips notnull">金额，必须大于0</span>
+                </td>
+            </tr>
+        </table>
+        <div class="control-window-btns">
+            <a class="button green" onclick="SaveBalance();">确定</a>
+            <a class="button white" onclick="control.close()">关闭</a>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var table = control.datagrid('dataTable', location.pathname + '?do=pager', 10);
+    function ToSearch(e) {
+        if (e.keyCode == 13) {
+            table.pageIndex = 1;
+            table.load({ key: $('#searchkey').val() })
+        }
+    }
+    table.State = function (e) {
+        if (e.State == '正常') {
+            return '<font style="color:#7DB72F">' + e.State + '</font>';
+        } else {
+            return '<font style="color:#999999">' + e.State + '</font>';
+        }
+    }
+    table.onAction = function (e) {
+        var str = '';
+        str += '<a href="member?mid=' + e.Id + '">查看</a>';
+        str += '　<a href="member?mid=' + e.Id + '#balance">充值</a>';
+        str += '　<a onclick="Form(\'' + e.Id + '\')">编辑</a>';
+        str += '　<a onclick="Del(\'' + e.Id + '\')">删除</a>';
+        return str;
+    }
+    function Member(Id) {
+        window.location.href = "member?mid=" + Id;
+    }
+    var thisId = '';
+    function Form(Id) {
+        thisId = '';
+        control.window('userinfo', Id ? '编辑' : '新会员', 520, 380,
+            function () {
+                if (Id) {
+                    $.getJSON(location.pathname + '?do=get', { Id: Id }, function (json) {
+                        if (json && json.Id) {
+                            thisId = json.Id;
+                            $('#MemberNumber').val(json.MemberNumber);
+                            $('#Name').val(json.Name);
+                            $('#Sex').val(json.Sex);
+                            $('#GroupId').val(json.GroupId); 
+                            $('#State').val(json.State);
+                        }
+                    });
+                } else {
+                    $('#trArea').show();
+                }
+            },
+            function () {
+                //关闭时回调
+            });
+    } 
+    function Save() {
+        $.getJSON(location.pathname + '?do=set', {
+            Id: thisId
+            , MemberNumber: encodeURIComponent($('#MemberNumber').val())
+            , Name: encodeURIComponent($('#Name').val())
+            , Sex: $('#Sex').val()
+            , GroupId: $('#GroupId').val()
+            , State: $('#State').val()
+        }, function (json) {
+            if (json.success) {
+                table.reload();
+                control.close();
+                location.href = "member?mid=" + json.data;
+            } else {
+                control.error(json.message);
+            }
+        });
+    }
+    function Del(Id) {
+        control.confirm('确定要删除此信息吗?', '操作确认', function () {
+            $.getJSON(location.pathname + '?do=del', { Id: Id }, function (json) {
+                if (json.success) {
+                    table.reload();
+                } else {
+                    control.error(json.message);
+                }
+            });
+        });
+    }
+    setTimeout(function () {
+        if (location.hash == "#new") {
+            Form('');
+        }
+    }, 300);
+</script>
